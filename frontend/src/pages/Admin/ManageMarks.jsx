@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Trash2 } from 'lucide-react';
 
 const ManageMarks = () => {
   const [batches, setBatches] = useState([]);
@@ -65,6 +66,15 @@ const ManageMarks = () => {
       setEditingId(null);
       fetchHistory();
     } catch (err) { alert('Failed to update marksheet'); }
+  };
+
+  const handleDeleteMarksheet = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this marksheet? This will instantly remove the scores from all enrolled students' portals.")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/marksheets/${id}`, { withCredentials: true });
+        fetchHistory();
+      } catch (err) { alert('Failed to delete marksheet'); }
+    }
   };
 
   const updateEditMark = (index, value) => {
@@ -237,11 +247,14 @@ const ManageMarks = () => {
                     <td className="p-4 px-6 text-white">{h.batch?.standard || 'Unknown'}</td>
                     <td className="p-4 px-6 text-white font-medium">{h.batch?.name || 'Unknown'}</td>
                     <td className="p-4 px-6">{new Date(h.date).toLocaleDateString()}</td>
-                    <td className="p-4 px-6 text-right">
+                    <td className="p-4 px-6 text-right space-x-2">
                       {editingId === h._id ? (
-                        <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-slate-600 hover:bg-slate-500 rounded text-xs text-white">Close</button>
+                        <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-slate-600 hover:bg-slate-500 rounded text-xs text-white transition-colors">Close</button>
                       ) : (
-                        <button onClick={() => startEdit(h)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-xs text-white">Edit Scores</button>
+                        <>
+                          <button onClick={() => startEdit(h)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-xs text-white transition-colors">Edit Scores</button>
+                          <button onClick={() => handleDeleteMarksheet(h._id)} className="px-3 py-1 bg-red-600/20 text-red-400 hover:bg-red-500 hover:text-white rounded text-xs transition-colors"><Trash2 className="w-4 h-4 inline" /></button>
+                        </>
                       )}
                     </td>
                   </tr>

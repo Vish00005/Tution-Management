@@ -156,6 +156,13 @@ exports.updateAttendance = async (req, res) => {
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
+exports.deleteAttendance = async (req, res) => {
+  try {
+    await Attendance.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Attendance record deleted globally' });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
 // === MARKS ===
 exports.addMarksheet = async (req, res) => {
   try {
@@ -176,6 +183,13 @@ exports.updateMarksheet = async (req, res) => {
   try {
     const marksheet = await Marksheet.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(marksheet);
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+exports.deleteMarksheet = async (req, res) => {
+  try {
+    await Marksheet.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Marksheet record deleted globally' });
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
 

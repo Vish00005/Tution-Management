@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Trash2 } from 'lucide-react';
 
 const ManageAttendance = () => {
   const [batches, setBatches] = useState([]);
@@ -74,6 +75,15 @@ const ManageAttendance = () => {
       setEditingId(null);
       fetchHistory();
     } catch (err) { alert('Failed to update attendance'); }
+  };
+
+  const handleDeleteAttendance = async (id) => {
+    if (window.confirm("Are you sure you want to permanently delete this attendance record? This will also remove it from all enrolled students' portals.")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/attendance/${id}`, { withCredentials: true });
+        fetchHistory();
+      } catch (err) { alert('Failed to delete attendance record'); }
+    }
   };
 
   const updateEditStatus = (index, status) => {
@@ -201,11 +211,14 @@ const ManageAttendance = () => {
                         {att.records?.length || 0} students
                       </span>
                     </td>
-                    <td className="p-4 px-6 text-right">
+                    <td className="p-4 px-6 text-right space-x-2">
                       {editingId === att._id ? (
-                        <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-slate-600 hover:bg-slate-500 rounded text-xs text-white">Close</button>
+                        <button onClick={() => setEditingId(null)} className="px-3 py-1 bg-slate-600 hover:bg-slate-500 rounded text-xs text-white transition-colors">Close</button>
                       ) : (
-                        <button onClick={() => startEdit(att)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-xs text-white">Edit Records</button>
+                        <>
+                          <button onClick={() => startEdit(att)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-xs text-white transition-colors">Edit Records</button>
+                          <button onClick={() => handleDeleteAttendance(att._id)} className="px-3 py-1 bg-red-600/20 text-red-400 hover:bg-red-500 hover:text-white rounded text-xs transition-colors"><Trash2 className="w-4 h-4 inline" /></button>
+                        </>
                       )}
                     </td>
                   </tr>
