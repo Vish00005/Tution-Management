@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 import {
   BookOpen,
   Users,
@@ -15,7 +16,12 @@ import {
 } from "lucide-react";
 
 const LandingPage = () => {
+  const { user, loading } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  if (!loading && user) {
+    return <Navigate to={user.role === 'student' ? '/student' : '/admin'} replace />;
+  }
   const scrollTo = (id) => {
     setIsMenuOpen(false);
     const el = document.getElementById(id);

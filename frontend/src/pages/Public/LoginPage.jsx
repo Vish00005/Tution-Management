@@ -1,14 +1,18 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { BookOpen, Mail, Lock } from 'lucide-react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useContext(AuthContext);
+  const { login, user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  if (!loading && user) {
+    return <Navigate to={user.role === 'student' ? '/student' : '/admin'} replace />;
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
