@@ -87,13 +87,13 @@ mongoose
         studentsInBatch.push(student);
       }
 
-      // Attendance (1 present, 1 late, 1 absent just as an example)
+      // Attendance (1 present, 2 absent just as an example)
       await Attendance.create({
         date: new Date(),
         batch: b._id,
         records: [
           { student: studentsInBatch[0]._id, status: "present" },
-          { student: studentsInBatch[1]._id, status: "late" },
+          { student: studentsInBatch[1]._id, status: "absent" },
           { student: studentsInBatch[2]._id, status: "absent" },
         ],
       });

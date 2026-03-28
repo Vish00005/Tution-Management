@@ -20,7 +20,7 @@ exports.getStudentStats = async (req, res) => {
       const record = att.records.find(r => r.student.toString() === studentId.toString());
       if (record) {
         attendanceRecords.push({ date: att.date, status: record.status });
-        if (record.status === 'present' || record.status === 'late') presentCount++;
+        if (record.status === 'present') presentCount++;
       }
     });
 
