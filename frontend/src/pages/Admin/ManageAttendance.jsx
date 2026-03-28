@@ -182,6 +182,7 @@ const ManageAttendance = () => {
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-800/50 text-slate-300">
               <tr>
+                <th className="p-4 px-6 font-medium">Standard</th>
                 <th className="p-4 px-6 font-medium">Batch</th>
                 <th className="p-4 px-6 font-medium">Date</th>
                 <th className="p-4 px-6 font-medium">Class Size</th>
@@ -192,6 +193,7 @@ const ManageAttendance = () => {
               {displayedHistory.map(att => (
                 <React.Fragment key={att._id}>
                   <tr className="hover:bg-white/5 text-slate-300">
+                    <td className="p-4 px-6 text-white">{att.batch?.standard || 'Unknown'}</td>
                     <td className="p-4 px-6 text-white font-medium">{att.batch?.name || 'Unknown'}</td>
                     <td className="p-4 px-6">{new Date(att.date).toLocaleDateString()}</td>
                     <td className="p-4 px-6">

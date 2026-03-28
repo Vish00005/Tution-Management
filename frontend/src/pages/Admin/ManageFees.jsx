@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { IndianRupee, Filter, CheckCircle, Clock, Search } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
@@ -21,6 +21,7 @@ const ManageFees = () => {
   // Payment Modal/Inline State
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState('');
+  const [expandedStudentId, setExpandedStudentId] = useState(null);
 
   useEffect(() => {
     fetchBatches();
@@ -145,7 +146,8 @@ const ManageFees = () => {
               const isPaid = total > 0 && paid >= total;
 
               return (
-                <tr key={student._id} className="text-slate-300 hover:bg-white/5">
+                <React.Fragment key={student._id}>
+                  <tr onClick={() => setExpandedStudentId(expandedStudentId === student._id ? null : student._id)} className="text-slate-300 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5">
                   <td className="p-4 px-6">
                     <div className="text-white font-medium">{student.name}</div>
                     <div className="text-xs text-slate-400">{student.standard}</div>
@@ -162,7 +164,7 @@ const ManageFees = () => {
                       <span className="px-2 py-1 bg-yellow-500/10 text-yellow-400 text-xs rounded border border-yellow-500/20">₹{remaining} Pending</span>
                     )}
                   </td>
-                  <td className="p-4 px-6 text-right">
+                  <td className="p-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
                     {editingStudentId === student._id ? (
                       <div className="flex justify-end gap-2 items-center">
                         <input type="number" placeholder="Amount" value={paymentAmount} onChange={e=>setPaymentAmount(e.target.value)} className="w-24 bg-slate-800 border border-slate-700 text-white rounded p-1.5 text-sm" />
@@ -176,6 +178,39 @@ const ManageFees = () => {
                     )}
                   </td>
                 </tr>
+                {expandedStudentId === student._id && student.feeHistory?.length > 0 && (
+                  <tr className="bg-slate-900/50">
+                    <td colSpan="6" className="p-0 border-b border-white/5">
+                      <div className="p-4 sm:p-6 bg-indigo-950/10 shadow-inner">
+                        <h4 className="text-sm font-semibold text-white mb-4 tracking-wide flex items-center"><Clock className="w-4 h-4 mr-2 text-indigo-400" />Transaction History</h4>
+                        <div className="space-y-3 pl-2 sm:pl-4 border-l-2 border-indigo-500/30">
+                          {student.feeHistory.slice().reverse().map((tx, idx) => (
+                            <div key={idx} className="flex justify-between items-center p-3 sm:px-5 bg-slate-800/80 rounded border border-white/5 text-slate-300">
+                              <div className="flex items-center gap-3 md:gap-4">
+                                <div className="hidden sm:flex bg-emerald-500/20 p-2 rounded-full"><CheckCircle className="w-4 h-4 text-emerald-400" /></div>
+                                <div>
+                                  <p className="font-medium text-white">{new Date(tx.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                  <p className="text-xs text-slate-500 mt-0.5">Method: {tx.method}</p>
+                                </div>
+                              </div>
+                              <span className="font-bold text-emerald-400 tracking-tight text-lg">+ ₹{tx.amount}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {expandedStudentId === student._id && (!student.feeHistory || student.feeHistory.length === 0) && (
+                  <tr className="bg-slate-900/50">
+                    <td colSpan="6" className="p-6 border-b border-white/5">
+                      <div className="text-center p-6 bg-slate-800/40 rounded border border-white/5 text-slate-500 text-sm italic">
+                        No recorded payment history available. Recent transactions will appear here.
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               )
             })}
           </tbody>

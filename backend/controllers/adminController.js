@@ -34,7 +34,14 @@ exports.addStudent = async (req, res) => {
   try {
     const { name, email, password, standard, batch, fatherContact, motherContact, totalFees, feesPaid } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const student = await User.create({ name, email, password: hashedPassword, plainPassword: password, role: 'student', standard, batch, fatherContact, motherContact, totalFees: totalFees || 0, feesPaid: feesPaid || 0 });
+    
+    let baseFee = totalFees || 0;
+    if (!baseFee && batch) {
+      const b = await Batch.findById(batch);
+      if (b && b.defaultFee) baseFee = b.defaultFee;
+    }
+
+    const student = await User.create({ name, email, password: hashedPassword, plainPassword: password, role: 'student', standard, batch, fatherContact, motherContact, totalFees: baseFee, feesPaid: feesPaid || 0 });
     res.status(201).json(student);
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
@@ -62,6 +69,15 @@ exports.updateStudent = async (req, res) => {
   try {
     const { name, email, standard, batch, fatherContact, motherContact, plainPassword } = req.body;
     let updateFields = { name, email, standard, batch: batch || null, fatherContact, motherContact };
+
+    // Automatically apply batch fee if they are moved into a batch and currently have no fees
+    if (batch) {
+      const existingStudent = await User.findById(req.params.id);
+      if (existingStudent && (!existingStudent.totalFees || existingStudent.totalFees === 0)) {
+        const b = await Batch.findById(batch);
+        if (b && b.defaultFee) updateFields.totalFees = b.defaultFee;
+      }
+    }
     
     if (plainPassword) {
       updateFields.plainPassword = plainPassword;
@@ -168,6 +184,7 @@ exports.updateBatchFees = async (req, res) => {
   try {
     const { batchId, totalFees } = req.body;
     await User.updateMany({ role: 'student', batch: batchId }, { $set: { totalFees } });
+    await Batch.findByIdAndUpdate(batchId, { defaultFee: totalFees });
     res.json({ message: 'Batch fees updated successfully' });
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
@@ -175,7 +192,21 @@ exports.updateBatchFees = async (req, res) => {
 exports.updateStudentFees = async (req, res) => {
   try {
     const { totalFees, feesPaid } = req.body;
-    const student = await User.findByIdAndUpdate(req.params.id, { totalFees, feesPaid }, { new: true });
+    const existingStudent = await User.findById(req.params.id);
+    
+    // Only calculate history if feesPaid changed
+    let paymentAmount = 0;
+    if (feesPaid !== undefined && existingStudent) {
+      paymentAmount = Number(feesPaid) - (existingStudent.feesPaid || 0);
+    }
+    
+    let updateOps = { $set: { totalFees, feesPaid } };
+    
+    if (paymentAmount > 0) {
+      updateOps.$push = { feeHistory: { amount: paymentAmount, date: new Date(), method: 'Cash' } };
+    }
+
+    const student = await User.findByIdAndUpdate(req.params.id, updateOps, { new: true });
     res.json(student);
   } catch (error) { res.status(500).json({ message: error.message }); }
 };

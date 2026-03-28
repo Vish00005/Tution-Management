@@ -220,6 +220,7 @@ const ManageMarks = () => {
               <tr>
                 <th className="p-4 px-6 font-medium">Title</th>
                 <th className="p-4 px-6 font-medium">Subject</th>
+                <th className="p-4 px-6 font-medium">Standard</th>
                 <th className="p-4 px-6 font-medium">Batch</th>
                 <th className="p-4 px-6 font-medium">Date</th>
                 <th className="p-4 px-6 font-medium text-right">Actions</th>
@@ -233,7 +234,8 @@ const ManageMarks = () => {
                     <td className="p-4 px-6">
                       <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded text-xs border border-indigo-500/20">{h.subject || 'General'}</span>
                     </td>
-                    <td className="p-4 px-6">{h.batch?.name || 'Unknown'}</td>
+                    <td className="p-4 px-6 text-white">{h.batch?.standard || 'Unknown'}</td>
+                    <td className="p-4 px-6 text-white font-medium">{h.batch?.name || 'Unknown'}</td>
                     <td className="p-4 px-6">{new Date(h.date).toLocaleDateString()}</td>
                     <td className="p-4 px-6 text-right">
                       {editingId === h._id ? (

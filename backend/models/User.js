@@ -15,7 +15,12 @@ const userSchema = new mongoose.Schema({
   motherContact: { type: String },
   totalFees: { type: Number, default: 0 },
   feesPaid: { type: Number, default: 0 },
-  subjects: { type: [String], default: ["Maths", "Science", "English", "Social Studies"] }
+  subjects: { type: [String], default: ["Maths", "Science", "English", "Social Studies"] },
+  feeHistory: [{
+    amount: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
+    method: { type: String, default: 'Cash' }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
