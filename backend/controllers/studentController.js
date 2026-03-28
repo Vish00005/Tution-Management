@@ -9,7 +9,7 @@ exports.getStudentStats = async (req, res) => {
     if (!student || !student.batch) return res.status(404).json({ message: 'Batch not assigned' });
     
     // Get all attendance for the student's batch
-    const allAttendance = await Attendance.find({ batch: student.batch._id });
+    const allAttendance = await Attendance.find({ batch: student.batch._id }).sort({ date: -1 });
     
     let presentCount = 0;
     let totalClasses = allAttendance.length;
@@ -24,7 +24,7 @@ exports.getStudentStats = async (req, res) => {
       }
     });
 
-    const marksheets = await Marksheet.find({ batch: student.batch._id });
+    const marksheets = await Marksheet.find({ batch: student.batch._id }).sort({ date: -1 });
     let marksRecords = [];
     marksheets.forEach(mark => {
       const record = mark.records.find(r => r.student.toString() === studentId.toString());
