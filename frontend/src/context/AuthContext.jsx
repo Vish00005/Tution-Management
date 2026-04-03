@@ -20,9 +20,19 @@ export const AuthProvider = ({ children }) => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
         withCredentials: true,
       });
-      setUser(res.data);
+      if (res.data.user) {
+        setUser(res.data.user);
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token);
+          axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+        }
+      } else {
+        setUser(res.data);
+      }
     } catch (error) {
       setUser(null);
+      localStorage.removeItem("token");
+      delete axios.defaults.headers.common["Authorization"];
     } finally {
       setLoading(false);
     }
