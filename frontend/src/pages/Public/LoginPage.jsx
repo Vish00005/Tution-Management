@@ -71,6 +71,33 @@ const LoginPage = () => {
             Sign In
           </button>
         </form>
+
+        <div className="mt-6 border-t border-slate-700/50 pt-6">
+          <p className="text-center text-xs text-slate-400 mb-4 uppercase tracking-wider font-semibold">Test Accounts</p>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => { setEmail('admin@institute.edu'); setPassword('admin123'); }}
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-lg border border-slate-700 transition-colors"
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('manager@institute.edu'); setPassword('manager123'); }}
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-lg border border-slate-700 transition-colors"
+            >
+              Manager
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('student10ba1@institute.edu'); setPassword('student123'); }}
+              className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm rounded-lg border border-slate-700 transition-colors"
+            >
+              Student
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
